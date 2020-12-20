@@ -1,21 +1,10 @@
 package bgu.spl.net.impl.passiveObjects;
 
-import java.util.List;
-
-public class Admin {
+public class Admin extends User {
     /*---------------------------------fields---------------------------------*/
-    private String username;
-    private String password;
     /*-------------------------------constructors------------------------------*/
     public Admin(String username, String password){
-        this.username = username;
-        this.password = password;
+        super(username, password);
     }
     /*---------------------------------getters---------------------------------*/
-    public String getUsername(){
-        return username;
-    }
-    public String getPassword() {
-        return password;
-    }
 }

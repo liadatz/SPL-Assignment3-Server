@@ -1,32 +1,28 @@
 package bgu.spl.net.impl.passiveObjects;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class Student {
+public class Student extends User {
 /*---------------------------------fields---------------------------------*/
-    private String username;
-    private String password;
-    private List<Course>  courses;
+    private ArrayList<Course> courses;
 /*-------------------------------constructors------------------------------*/
-    public Student(String username, String password, List<Course> courses){
-        this.username = username;
-        this.password = password;
+    public Student(String username, String password, ArrayList<Course> courses){
+        super(username, password);
         this.courses = courses;
     }
 /*---------------------------------getters---------------------------------*/
-    public String getUsername(){
-        return username;
-    }
-    public String getPassword() {
-        return password;
-    }
-    public List<Course> getCourses() {
+    public ArrayList<Course> getCourses() {
         return courses;
     }
 /*---------------------------------methods---------------------------------*/
     public void addCourse(Course toAdd){
         if (toAdd != null)
             courses.add(toAdd);
+    }
+
+    public void removeCourse(Course toRemove) {
+        courses.remove(toRemove);
     }
 
     public boolean checkCourse(Course toCheck){

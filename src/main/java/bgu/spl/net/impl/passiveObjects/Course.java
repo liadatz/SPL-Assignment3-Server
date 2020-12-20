@@ -3,12 +3,13 @@ package bgu.spl.net.impl.passiveObjects;
 import java.util.List;
 
 public class Course {
+/*---------------------------------fields---------------------------------*/
     int courseNum;
     String courseName;
     List<Course> KdamCoursesList;
     int numOfMaxStudents;
     int numOfRegistered;
-
+/*-------------------------------constructors------------------------------*/
     public Course(int courseNum, String courseName, List<Course> kdamCoursesList, int numOfMaxStudents, int numOfRegistered) {
         this.courseNum = courseNum;
         this.courseName = courseName;
@@ -16,7 +17,7 @@ public class Course {
         this.numOfMaxStudents = numOfMaxStudents;
         this.numOfRegistered = numOfRegistered;
     }
-
+/*---------------------------------getters---------------------------------*/
     public int getCourseNum() {
         return courseNum;
     }
@@ -37,8 +38,17 @@ public class Course {
         return numOfRegistered;
     }
 
+/*---------------------------------methods---------------------------------*/
     public void increaseNumOfRegistered(){
         if (numOfRegistered < numOfMaxStudents) numOfRegistered++;
+    }
+
+    public boolean isRoomAvailable(){
+        return numOfRegistered == numOfMaxStudents;
+    }
+
+    public String toString(){
+        return "" + courseNum;
     }
 
 
