@@ -27,8 +27,6 @@ public class Database {
 	private ConcurrentHashMap<String, Admin> AdminsMap;
 	private ConcurrentHashMap<Integer, Course> CoursesMap;
 
-
-
 	//to prevent user from creating new Database
 	private Database() {
 		StudentsMap = new ConcurrentHashMap<>();
@@ -52,27 +50,27 @@ public class Database {
 		return false;
 	}
 
-	private boolean isRegistered(String userName, boolean isAdmin) {
+	public boolean isRegistered(String userName, boolean isAdmin) {
 		if (isAdmin) return AdminsMap.containsKey(userName);
 		else return StudentsMap.containsKey(userName);
 	}
 
-	private boolean isValidPassword(String userName, String Password, boolean isAdmin) {
+	public boolean isValidPassword(String userName, String Password, boolean isAdmin) {
 		String toCompare;
 		if (isAdmin) toCompare = AdminsMap.get(userName).getPassword();
 		else toCompare = StudentsMap.get(userName).getPassword();
 		return Password.equals(toCompare);
 	}
 
-	private boolean isExist(int numOfCourse) {
+	public boolean isExist(int numOfCourse) {
 		return CoursesMap.containsKey(numOfCourse);
 	}
 
-	private boolean isRoomAvailable(int numOfCourse) {
+	public boolean isRoomAvailable(int numOfCourse) {
 		return CoursesMap.get(numOfCourse).isRoomAvailable();
 	}
 
-	private boolean isKdamDone(String userName, int numOfCourse) {
+	public boolean isKdamDone(String userName, int numOfCourse) {
 		List<Course> KdamList = CoursesMap.get(numOfCourse).getKdamCoursesList();
 		Student currentStudent = StudentsMap.get(userName);
 		boolean result = true;
@@ -83,31 +81,31 @@ public class Database {
 		return result;
 	}
 
-	private boolean isAdmin(User user) {
+	public boolean isAdmin(User user) {
 		return user instanceof Admin;
 	}
 
-	private void register(String userName, String Password, boolean isAdmin) {
+	public void register(String userName, String Password, boolean isAdmin) {
 		if (isAdmin) {
 			Admin newAdmin = new Admin(userName, Password);
 			AdminsMap.put(userName, newAdmin);
 		}
 		else {
-			Student newStudent = new Student(userName, Password, new ArrayList<>()); // maybe change arraylist
+			Student newStudent = new Student(userName, Password, new ArrayList<Course>()); // maybe change arraylist
 			StudentsMap.put(userName, newStudent);
 		}
 	}
 
-	private void courseRegister(String userName, int numOfCourse) {
+	public void courseRegister(String userName, int numOfCourse) {
 		Course currentCourse = CoursesMap.get(numOfCourse);
 		StudentsMap.get(userName).addCourse(currentCourse);
 	}
 
-	private String KdamCheck(int numOfCourse) {
+	public String KdamCheck(int numOfCourse) {
 		return CoursesMap.get(numOfCourse).getKdamCoursesList().toString();
 	}
 
-	private String ComposeCourseStat(int numOfCourse) {
+	public String ComposeCourseStat(int numOfCourse) {
 		String output;
 		Course currentCourse = CoursesMap.get(numOfCourse);
 		output = "Course: (" + numOfCourse + ") " + currentCourse.getCourseName() + "/n"
@@ -116,22 +114,37 @@ public class Database {
 		return output;
 	}
 
-	private String ComposeStudentStat(String userName) {
+	public String ComposeStudentStat(String userName) {
 		Student currentStudent = StudentsMap.get(userName);
 		return  "Student: " + currentStudent.getUsername() + "/n" + currentStudent.getCourses().toString();
 	}
 
-	private boolean courseCheck(String userName, int numOfCourse) {
+	public boolean courseCheck(String userName, int numOfCourse) {
 		Course course = CoursesMap.get(numOfCourse);
 		return StudentsMap.get(userName).checkCourse(course);
 	}
 
-	private void unregister(String userName, int numOfCourse) {
+	public void unregister(String userName, int numOfCourse) {
 		Course course = CoursesMap.get(numOfCourse);
 		StudentsMap.get(userName).removeCourse(course);
 	}
 
-	private String myCourses(String userName) {
+	public String myCourses(String userName) {
 		return StudentsMap.get(userName).getCourses().toString();
+	}
+
+	public void logIn(String username, boolean isAdmin){
+		if (isAdmin) AdminsMap.get(username).setLogIn(true);
+		else StudentsMap.get(username).setLogIn(true);
+	}
+
+	public void logOut(String username, boolean isAdmin){
+		if (isAdmin) AdminsMap.get(username).setLogIn(false);
+		else StudentsMap.get(username).setLogIn(false);
+	}
+
+	public boolean isLogedIn(String username, boolean isAdmin){
+		if (isAdmin) return AdminsMap.get(username).isLogedIn();
+		else return StudentsMap.get(username).isLogedIn();
 	}
 }
