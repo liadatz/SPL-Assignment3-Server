@@ -1,6 +1,6 @@
 package bgu.spl.net.impl.Messages;
 
-import bgu.spl.net.Database;
+import bgu.spl.net.srv.Database;
 import bgu.spl.net.api.Message;
 
 public class LogInMessage implements Message {
@@ -24,7 +24,7 @@ public class LogInMessage implements Message {
     /*---------------------------------methods---------------------------------*/
     @Override
     public Message process() {
-        if ((database.isRegistered(username, isAdmin)) && (database.isValidPassword(username, password, isAdmin)) && !database.isLogedIn(username, isAdmin)){
+        if ((database.isRegistered(username, isAdmin)) && (database.isValidPassword(username, password, isAdmin)) && !database.isLoggedIn(username, isAdmin)){
             database.logIn(username, isAdmin);
             return new AckMessage(opt, null); //no optional
         }

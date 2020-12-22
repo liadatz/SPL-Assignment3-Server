@@ -1,6 +1,5 @@
 package bgu.spl.net.impl.Messages;
 
-import bgu.spl.net.Database;
 import bgu.spl.net.api.Message;
 
 public class AckMessage implements Message {

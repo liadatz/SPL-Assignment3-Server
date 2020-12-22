@@ -1,6 +1,6 @@
 package bgu.spl.net.impl.Messages;
 
-import bgu.spl.net.Database;
+import bgu.spl.net.srv.Database;
 import bgu.spl.net.api.Message;
 
 public class CourseReg implements Message {
@@ -26,7 +26,7 @@ public class CourseReg implements Message {
     public Message process() {
         boolean isApproved = !isAdmin && database.isExist(courseNum) && database.isRoomAvailable(courseNum) &&
                 database.isRegistered(username, isAdmin) && database.isKdamDone(username, courseNum) &&
-                database.isLogedIn(username, isAdmin);
+                database.isLoggedIn(username, isAdmin);
         if (isApproved) {
             database.courseRegister(username, courseNum);
             return new AckMessage(opt, null); //no optional

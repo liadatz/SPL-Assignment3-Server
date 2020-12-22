@@ -10,12 +10,12 @@ public class Course {
     int numOfMaxStudents;
     int numOfRegistered;
 /*-------------------------------constructors------------------------------*/
-    public Course(int courseNum, String courseName, List<Course> kdamCoursesList, int numOfMaxStudents, int numOfRegistered) {
+    public Course(int courseNum, String courseName, List<Course> kdamCoursesList, int numOfMaxStudents) {
         this.courseNum = courseNum;
         this.courseName = courseName;
         KdamCoursesList = kdamCoursesList;
         this.numOfMaxStudents = numOfMaxStudents;
-        this.numOfRegistered = numOfRegistered;
+        this.numOfRegistered = 0;
     }
 /*---------------------------------getters---------------------------------*/
     public int getCourseNum() {
@@ -44,11 +44,15 @@ public class Course {
     }
 
     public boolean isRoomAvailable(){
-        return numOfRegistered == numOfMaxStudents;
+        return numOfRegistered < numOfMaxStudents;
     }
 
     public String toString(){
         return "" + courseNum;
+    }
+
+    public void addKdamCourse(Course courseToAdd) {
+        KdamCoursesList.add(courseToAdd);
     }
 
 

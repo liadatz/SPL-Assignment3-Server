@@ -4,12 +4,12 @@ public class User {
     /*---------------------------------fields---------------------------------*/
     private String username;
     private String password;
-    private boolean isLogedIn; // maybe add online status? -i think its the best option
+    private boolean isLogged; // maybe add online status? -i think its the best option
     /*-------------------------------constructors------------------------------*/
     public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.isLogedIn = false;
+        this.isLogged = false;
     }
     /*---------------------------------getters---------------------------------*/
     public String getUsername(){
@@ -18,7 +18,7 @@ public class User {
     public String getPassword() {
         return password;
     }
-    public boolean isLogedIn(){return isLogedIn;}
+    public boolean isLogged(){return isLogged;}
     /*---------------------------------getters---------------------------------*/
-    public void setLogIn(boolean status){this.isLogedIn = status;}
+    public void setLogIn(boolean status){this.isLogged = status;}
 }
