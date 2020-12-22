@@ -5,7 +5,7 @@ import bgu.spl.net.api.Message;
 
 public class StringMessage implements Message {
     /*---------------------------------fields---------------------------------*/
-    String msg;
+    private String msg;
     /*-------------------------------constructors------------------------------*/
     public StringMessage(String msg) {
         this.msg = msg;

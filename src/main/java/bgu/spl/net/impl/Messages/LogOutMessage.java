@@ -6,12 +6,12 @@ import bgu.spl.net.api.Message;
 public class LogOutMessage implements Message {
     /*---------------------------------fields---------------------------------*/
     private int opt; //in all messages
-    boolean isAdmin;
-    Database database; //in all messages
+    private boolean isAdmin;
+    private Database database; //in all messages
     /*-------------------------------constructors------------------------------*/
 
-    public LogOutMessage(int opt, boolean isAdmin) {
-        this.opt = opt;
+    public LogOutMessage(boolean isAdmin) {
+        this.opt = 4;
         this.isAdmin = isAdmin;
         database = Database.getInstance();
     }

@@ -6,12 +6,12 @@ import bgu.spl.net.api.Message;
 public class KdamCheckMessage implements Message {
     /*---------------------------------fields---------------------------------*/
     private int opt;
-    int courseNum;
-    Database database;
+    private int courseNum;
+    private Database database;
     /*-------------------------------constructors------------------------------*/
 
-    public KdamCheckMessage(int opt, int courseNum) {
-        this.opt = opt;
+    public KdamCheckMessage(int courseNum) {
+        this.opt = 6;
         this.courseNum = courseNum;
         database = Database.getInstance();
     }

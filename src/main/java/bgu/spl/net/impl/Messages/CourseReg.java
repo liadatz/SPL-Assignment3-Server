@@ -6,14 +6,14 @@ import bgu.spl.net.api.Message;
 public class CourseReg implements Message {
     /*---------------------------------fields---------------------------------*/
     private int opt;
-    String username;
-    int courseNum;
-    boolean isAdmin;
-    Database database;
+    private String username;
+    private int courseNum;
+    private boolean isAdmin;
+    private Database database;
     /*-------------------------------constructors------------------------------*/
 
-    public CourseReg(int opt, String username, int courseNum, boolean isAdmin) {
-        this.opt = opt;
+    public CourseReg(String username, int courseNum, boolean isAdmin) {
+        this.opt = 5;
         this.username = username;
         this.courseNum = courseNum;
         this.isAdmin = isAdmin;
@@ -29,10 +29,10 @@ public class CourseReg implements Message {
                 database.isLogedIn(username, isAdmin);
         if (isApproved) {
             database.courseRegister(username, courseNum);
-            return new AckMessage();
+            return new AckMessage(opt, null); //no optional
         }
         else
-            return new ErrorMessage();
+            return new ErrorMessage(opt);
     }
 
 }

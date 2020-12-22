@@ -6,9 +6,9 @@ import bgu.spl.net.api.Message;
 public class GetStatMessage implements Message {
     /*---------------------------------fields---------------------------------*/
     private int opt;
-    String username;
-    int courseNum;
-    Database database;
+    private String username;
+    private int courseNum;
+    private Database database;
     /*-------------------------------constructors------------------------------*/
 
     public GetStatMessage(int opt, String username, int courseNum) {
@@ -26,7 +26,7 @@ public class GetStatMessage implements Message {
             System.out.print(database.ComposeStudentStat(username));
         else
             System.out.print(database.ComposeCourseStat(courseNum));
-        return new AckMessage(); //always ackMessage? sometime error? need to check if student logged in? if course is registered? fuck them
+        return new AckMessage(opt, null); //always ackMessage? sometime error? need to check if student logged in? if course is registered? fuck them
     }
 
 
