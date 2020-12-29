@@ -7,7 +7,7 @@ public class Message {
     private String password; //for adminreg, studentreg, login, logout
     private int courseNum; //for coursereg, kdamcheck, coursestat, studentdstat, isregistered, unregister
     private short msgOpcode; // for error and acknowledge
-    private Object optional; //for acknowledge
+    private String optional; //for acknowledge
     /*-------------------------------constructors------------------------------*/
     public Message(short opcode){
         this.opcode = opcode;
@@ -33,7 +33,7 @@ public class Message {
         return msgOpcode;
     }
 
-    public Object getOptional() {
+    public String getOptional() {
         return optional;
     }
 
@@ -54,7 +54,7 @@ public class Message {
         this.msgOpcode = msgOpcode;
     }
 
-    public void setOptional(Object optional) {
+    public void setOptional(String optional) {
         this.optional = optional;
     }
     /*---------------------------------methods---------------------------------*/

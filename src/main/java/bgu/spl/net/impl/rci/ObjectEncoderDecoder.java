@@ -34,7 +34,6 @@ public class ObjectEncoderDecoder implements MessageEncoderDecoder<Serializable>
                 return result;
             }
         }
-
         return null;
     }
 
@@ -48,9 +47,8 @@ public class ObjectEncoderDecoder implements MessageEncoderDecoder<Serializable>
             ObjectInput in = new ObjectInputStream(new ByteArrayInputStream(objectBytes));
             return (Serializable) in.readObject();
         } catch (Exception ex) {
-            throw new IllegalArgumentException("cannot desrialize object", ex);
+            throw new IllegalArgumentException("cannot deserialize object", ex);
         }
-
     }
 
     private byte[] serializeObject(Serializable message) {
