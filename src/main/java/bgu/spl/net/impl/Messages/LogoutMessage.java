@@ -1,23 +1,11 @@
 package bgu.spl.net.impl.Messages;
 
-import bgu.spl.net.api.Message;
+import bgu.spl.net.srv.Database;
 
-public class ErrorMessage implements Message {
+public class LogoutMessage extends Message {
     /*---------------------------------fields---------------------------------*/
-    private int opt;
-    private int msgOpcode;
     /*-------------------------------constructors------------------------------*/
-
-    public ErrorMessage(int msgOpcode) {
-        this.opt = 12;
-        this.msgOpcode = msgOpcode;
-    }
     /*---------------------------------getters---------------------------------*/
     /*---------------------------------setters---------------------------------*/
     /*---------------------------------methods---------------------------------*/
-    @Override
-    public Message process() { //not necessary, should implement message?
-        return null;
-    }
-
 }

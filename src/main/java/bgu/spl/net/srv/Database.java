@@ -59,7 +59,7 @@ public class Database {
 				String[] currentLine = sc.nextLine().split("[|]");
 				Course newCourse = new Course(Integer.parseInt(currentLine[0]), currentLine[1], new ArrayList<>(), Integer.parseInt(currentLine[3]));
 				Kdam = Kdam + currentLine[0] + "|" +  currentLine[2].substring(1,currentLine[2].length()-1) + "|";
-				CoursesMap.put(Integer.parseInt(currentLine[0]), newCourse);
+//				CoursesMap.put(Integer.parseInt(currentLine[0]), newCourse);
 			}
 		}
 		catch (FileNotFoundException e) {
@@ -108,7 +108,7 @@ public class Database {
 		return result;
 	}
 
-	public boolean isAdmin(User user) {
+	public boolean isAdmin(String username) {
 		return user instanceof Admin;
 	}
 

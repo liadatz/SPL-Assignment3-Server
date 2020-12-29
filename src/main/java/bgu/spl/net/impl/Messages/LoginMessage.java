@@ -1,25 +1,12 @@
 package bgu.spl.net.impl.Messages;
 
-import bgu.spl.net.api.Message;
-
-public class AckMessage implements Message {
-    /*---------------------------------fields---------------------------------*/
-    private int opt;
-    private int msgOpcode;
-    Object optional; //too general?
-    /*-------------------------------constructors------------------------------*/
-
-    public AckMessage(int msgOpcode, Object optional) {
-        this.opt = 12;
-        this.msgOpcode = msgOpcode;
-        this.optional = optional;
+public class LoginMessage extends Message {
+    public LoginMessage(short opcode) {
+        super(opcode);
     }
+    /*---------------------------------fields---------------------------------*/
+    /*-------------------------------constructors------------------------------*/
     /*---------------------------------getters---------------------------------*/
     /*---------------------------------setters---------------------------------*/
     /*---------------------------------methods---------------------------------*/
-    @Override
-    public Message process() { //not necessary, should implement message?
-        return null;
-    }
-
 }

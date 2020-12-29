@@ -1,20 +1,14 @@
 package bgu.spl.net.impl.Messages;
 
-import bgu.spl.net.api.Message;
+import bgu.spl.net.impl.rci.Command;
+import bgu.spl.net.srv.Database;
 
-public class StringMessage implements Message {
+import java.io.Serializable;
+
+public class CourseRegMessage extends Message {
     /*---------------------------------fields---------------------------------*/
-    private String msg;
     /*-------------------------------constructors------------------------------*/
-    public StringMessage(String msg) {
-        this.msg = msg;
-    }
     /*---------------------------------getters---------------------------------*/
     /*---------------------------------setters---------------------------------*/
     /*---------------------------------methods---------------------------------*/
-    @Override
-    public Message process() { //no need, nothing to process
-        return null;
-    }
 }
-
