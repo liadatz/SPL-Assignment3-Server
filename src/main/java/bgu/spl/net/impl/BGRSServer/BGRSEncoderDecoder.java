@@ -1,27 +1,24 @@
-package bgu.spl.net.impl.BGRS;
+package bgu.spl.net.impl.BGRSServer;
 
 import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.impl.Messages.Message;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
 
     private byte[] shortBytes = new byte[2];
     private byte[] stringBytes = new byte[1 << 10];
-    private int length = 0;
-    private ByteBuffer intBuffer = ByteBuffer.allocate(4); //final?
+    private int stringBytesLength = 0;
     private int optCounter = 0; //can be replaced with length ?
-    private int shortCounter = 0;//can be replaced with length ?
-    private int stringCounter = 0; //for username and password
-    //private int stringCounter_2 = 0; //for username only
+    private int shortCounter = 0; //can be replaced with length ?
     private short optNum = 0;
-    private String username; //?
-    private String password; //?
+    private String username = "";
+    private String password = "";
 
     @Override
     public Message decodeNextByte(byte nextByte) {
         //decoding opt
+
         if (optCounter < 2){
             shortBytes[optCounter] = nextByte;
             optCounter++;
@@ -41,30 +38,8 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
             return decoded;
         }
 
-        else if (optNum != 0 & optNum < 4){ //opt is 1-3 (decode String)
-            if (stringCounter < 2){
-                if (nextByte == '0') {
-                    if (username.isEmpty()) {
-                        username = new String(stringBytes, 0, length, StandardCharsets.UTF_8);
-                        stringCounter++;
-                    }
-                    else {
-                        password = new String(stringBytes, 0, length, StandardCharsets.UTF_8);
-                        Message decoded = new Message(optNum);
-                        decoded.setUsername(username);
-                        decoded.setPassword(password);
-                        optNum = 0;
-                        username = new String();
-                        password = new String();
-                        stringCounter = 0;
-                        return decoded;
-                    }
-                }
-                    else{
-                        stringBytes[length] = nextByte;
-                        length++;
-                    }
-            }
+        else if (optNum != 0 & optNum < 4 | optNum == 8) { //opt is 1-3 or 8 (decode String)
+            return decodeString(nextByte);
         }
 
         else if (optNum != 0){ //opt is 5-7 or 9-10 (decode short)
@@ -80,7 +55,6 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
                 shortCounter = 0;
                 optNum =0;
                 return decoded;
-
             }
         }
         return null; // if opNum is still 0 (?)
@@ -93,6 +67,32 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
         return result;
     }
 
+    public Message decodeString(byte nextByte){
+        if (nextByte == '0' & username.isEmpty()) {
+            username = new String(stringBytes, 0, stringBytesLength, StandardCharsets.UTF_8);
+            if (optNum == 8) return composeMessage();
+            else return null;
+        }
+        else if (nextByte == '0') {
+            password = new String(stringBytes, 0, stringBytesLength, StandardCharsets.UTF_8);
+            return composeMessage();
+        }
+        else {
+            stringBytes[stringBytesLength] = nextByte;
+            stringBytesLength++;
+            return null;
+        }
+    }
+
+    public Message composeMessage(){
+        Message decoded = new Message(optNum);
+        decoded.setUsername(username);
+        decoded.setPassword(password);
+        optNum = 0;
+        username = "";
+        password = "";
+        return decoded;
+    }
 
     @Override
     public byte[] encode(Message message) {
