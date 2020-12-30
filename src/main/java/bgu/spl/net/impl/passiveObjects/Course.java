@@ -4,13 +4,13 @@ import java.util.List;
 
 public class Course {
 /*---------------------------------fields---------------------------------*/
-    int courseNum;
+    short courseNum;
     String courseName;
     List<Course> KdamCoursesList;
     int numOfMaxStudents;
     int numOfRegistered;
 /*-------------------------------constructors------------------------------*/
-    public Course(int courseNum, String courseName, List<Course> kdamCoursesList, int numOfMaxStudents) {
+    public Course(short courseNum, String courseName, List<Course> kdamCoursesList, int numOfMaxStudents) {
         this.courseNum = courseNum;
         this.courseName = courseName;
         KdamCoursesList = kdamCoursesList;
@@ -18,7 +18,7 @@ public class Course {
         this.numOfRegistered = 0;
     }
 /*---------------------------------getters---------------------------------*/
-    public int getCourseNum() {
+    public short getCourseNum() {
         return courseNum;
     }
 

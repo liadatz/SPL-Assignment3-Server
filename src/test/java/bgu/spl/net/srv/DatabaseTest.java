@@ -26,32 +26,32 @@ class DatabaseTest {
     @Test
     void RegisterChecks() {
         database.register("liad1", "password1", true);
-        assertTrue(database.isRegistered("liad1", true));
+        assertTrue(database.isRegistered("liad1"));
         database.register("liad2","password2", false);
-        assertTrue(database.isRegistered("liad2",false));
+        assertTrue(database.isRegistered("liad2"));
     }
 
     @Test
     void isValidPassword() {
         database.register("liad1", "password1", true);
-        assertTrue(database.isValidPassword("liad1", "password1", true));
+        assertTrue(database.isValidPassword("liad1", "password1"));
         database.register("liad2","password2", false);
-        assertTrue(database.isValidPassword("liad2","password2", false));
+        assertTrue(database.isValidPassword("liad2","password2"));
     }
 
     @Test
     void isExist() {
-        assertTrue(database.isExist(101));
-        assertTrue(database.isExist(102));
-        assertTrue(database.isExist(103));
-        assertTrue(database.isExist(111));
-        assertTrue(database.isExist(201));
-        assertTrue(database.isExist(202));
-        assertTrue(database.isExist(211));
-        assertTrue(database.isExist(311));
-        assertTrue(database.isExist(301));
-        assertTrue(database.isExist(400));
-        assertFalse(database.isExist(0));
+        assertTrue(database.isCourseExist(101));
+        assertTrue(database.isCourseExist(102));
+        assertTrue(database.isCourseExist(103));
+        assertTrue(database.isCourseExist(111));
+        assertTrue(database.isCourseExist(201));
+        assertTrue(database.isCourseExist(202));
+        assertTrue(database.isCourseExist(211));
+        assertTrue(database.isCourseExist(311));
+        assertTrue(database.isCourseExist(301));
+        assertTrue(database.isCourseExist(400));
+        assertFalse(database.isCourseExist(0));
     }
 
     @Test
@@ -85,14 +85,6 @@ class DatabaseTest {
         assertTrue(database.isKdamDone("liad1",301));
     }
 
-    @Test
-    void isAdmin() {
-        Admin admin = new Admin("liad1", "password1");
-        Student student = new Student("liad2", "password2", new ArrayList<>());
-        assertTrue(database.isAdmin(admin));
-        assertFalse(database.isAdmin(student));
-    }
-
 
     @Test
     void kdamCheck() {
@@ -112,11 +104,14 @@ class DatabaseTest {
     @Test
     void unregister() {
         database.register("liad1","password1", false);
-        assertFalse(database.courseCheck("liad1", 101));
+        assertNotEquals("REGISTERED", database.courseCheck("liad1", 101));
+        assertEquals("NOT REGISTERED", database.courseCheck("liad1", 101));
         database.courseRegister("liad1", 101);
-        assertTrue(database.courseCheck("liad1", 101));
+        assertEquals("REGISTERED", database.courseCheck("liad1", 101));
+        assertNotEquals("NOT REGISTERED", database.courseCheck("liad1", 101));
         database.unregister("liad1", 101);
-        assertFalse(database.courseCheck("liad1", 101));
+        assertEquals("NOT REGISTERED", database.courseCheck("liad1", 101));
+        assertNotEquals("REGISTERED", database.courseCheck("liad1", 101));
     }
 
     @Test
@@ -131,15 +126,15 @@ class DatabaseTest {
     @Test
     void log() {
         database.register("liad1", "password1", true);
-        database.logIn("liad1", true);
-        assertTrue(database.isLoggedIn("liad1", true));
-        database.logOut("liad1", true);
-        assertFalse(database.isLoggedIn("liad1", true));
+        database.logIn("liad1");
+        assertTrue(database.isLoggedIn("liad1"));
+        database.logOut("liad1");
+        assertFalse(database.isLoggedIn("liad1"));
 
         database.register("liad2","password2", false);
-        database.logIn("liad2", false);
-        assertTrue(database.isLoggedIn("liad2", false));
-        database.logOut("liad2", false);
-        assertFalse(database.isLoggedIn("liad2", false));
+        database.logIn("liad2");
+        assertTrue(database.isLoggedIn("liad2"));
+        database.logOut("liad2");
+        assertFalse(database.isLoggedIn("liad2"));
     }
 }

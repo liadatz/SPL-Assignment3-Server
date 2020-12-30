@@ -13,7 +13,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 /**
  * Passive object representing the Database where all courses and users are stored.
@@ -38,6 +37,7 @@ public class Database {
 		StudentsMap = new ConcurrentHashMap<>();
 		AdminsMap = new ConcurrentHashMap<>();
 		CoursesMap = new ConcurrentHashMap<>();
+		LoggedInMap = new ConcurrentHashMap<>();
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class Database {
 			Scanner sc = new Scanner(file);
 			while(sc.hasNextLine()) {
 				String[] currentLine = sc.nextLine().split("[|]");
-				Course newCourse = new Course(Integer.parseInt(currentLine[0]), currentLine[1], new ArrayList<>(), Integer.parseInt(currentLine[3]));
+				Course newCourse = new Course(Short.parseShort(currentLine[0]), currentLine[1], new ArrayList<>(), Integer.parseInt(currentLine[3]));
 				Kdam.append(currentLine[0]).append("|").append(currentLine[2], 1, currentLine[2].length() - 1).append("|");
 				CoursesMap.put(Integer.parseInt(currentLine[0]), newCourse);
 			}

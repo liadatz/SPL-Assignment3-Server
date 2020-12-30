@@ -2,6 +2,8 @@ package bgu.spl.net.impl.BGRSServer;
 
 import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.impl.Messages.Message;
+
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
@@ -94,8 +96,40 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
         return decoded;
     }
 
+    public byte[] shortToBytes(short num) {
+        byte[] bytesArr = new byte[2];
+        bytesArr[0] = (byte)((num >> 8) & 0xFF);
+        bytesArr[1] = (byte)(num & 0xFF);
+        return bytesArr;
+    }
+
     @Override
     public byte[] encode(Message message) {
-        return new byte[0];
+        short opCode = message.getOpcode();
+        if (opCode == 12) return encodeACK(message);
+        else return encodeERR(message);
+    }
+
+    private byte[] encodeACK(Message message) {
+        byte[] opcode = shortToBytes(message.getOpcode());
+        byte[] messageOpcode = shortToBytes(message.getMsgOpcode());
+        byte[] optional = new byte[0];
+        if (message.containOptional()) optional = message.getOptional().getBytes();
+        byte[] endMsg = {'\0'};
+        ByteBuffer encoded = ByteBuffer.allocate(opcode.length + messageOpcode.length + optional.length + endMsg.length);
+        encoded.put(opcode);
+        encoded.put(messageOpcode);
+        encoded.put(optional);
+        encoded.put(endMsg);
+        return encoded.array();
+    }
+
+    private byte[] encodeERR(Message message) {
+        byte[] opcode = shortToBytes(message.getOpcode());
+        byte[] messageOpcode = shortToBytes(message.getMsgOpcode());
+        ByteBuffer encoded = ByteBuffer.allocate(opcode.length + messageOpcode.length);
+        encoded.put(opcode);
+        encoded.put(messageOpcode);
+        return encoded.array();
     }
 }

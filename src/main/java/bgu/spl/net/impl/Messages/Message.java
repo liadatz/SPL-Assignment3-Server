@@ -57,5 +57,9 @@ public class Message {
     public void setOptional(String optional) {
         this.optional = optional;
     }
+
+    public boolean containOptional() {
+        return optional != null;
+    }
     /*---------------------------------methods---------------------------------*/
 }
