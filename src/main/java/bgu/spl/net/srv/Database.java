@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 /**
  * Passive object representing the Database where all courses and users are stored.
@@ -30,6 +31,7 @@ public class Database {
 	private ConcurrentHashMap<String, Student> StudentsMap;
 	private ConcurrentHashMap<String, Admin> AdminsMap;
 	private ConcurrentHashMap<Integer, Course> CoursesMap;
+	private ConcurrentHashMap<String, User> LoggedInMap;
 
 	//to prevent user from creating new Database
 	private Database() {
@@ -52,21 +54,21 @@ public class Database {
 	boolean initialize(String coursesFilePath) {
 		// read file from Path
 		File file = new File(coursesFilePath);
-		String Kdam = "";
+		StringBuilder Kdam = new StringBuilder();
 		try {
 			Scanner sc = new Scanner(file);
 			while(sc.hasNextLine()) {
 				String[] currentLine = sc.nextLine().split("[|]");
 				Course newCourse = new Course(Integer.parseInt(currentLine[0]), currentLine[1], new ArrayList<>(), Integer.parseInt(currentLine[3]));
-				Kdam = Kdam + currentLine[0] + "|" +  currentLine[2].substring(1,currentLine[2].length()-1) + "|";
-//				CoursesMap.put(Integer.parseInt(currentLine[0]), newCourse);
+				Kdam.append(currentLine[0]).append("|").append(currentLine[2], 1, currentLine[2].length() - 1).append("|");
+				CoursesMap.put(Integer.parseInt(currentLine[0]), newCourse);
 			}
 		}
 		catch (FileNotFoundException e) {
 			return false;
 		}
 		// add Kdam Course for each course
-		String[] couresesAndKdams = Kdam.split("[|]");
+		String[] couresesAndKdams = Kdam.toString().split("[|]");
 		for (int i = 0; i < couresesAndKdams.length; i = i + 2) {
 			Course currentCourse = CoursesMap.get(Integer.parseInt(couresesAndKdams[i]));
 			String[] Kdams = couresesAndKdams[i+1].split(",");
@@ -77,19 +79,18 @@ public class Database {
 		return true;
 	}
 
-	public boolean isRegistered(String userName, boolean isAdmin) {
-		if (isAdmin) return AdminsMap.containsKey(userName);
-		else return StudentsMap.containsKey(userName);
+	public boolean isRegistered(String userName) {
+		return AdminsMap.containsKey(userName) || StudentsMap.containsKey(userName);
 	}
 
-	public boolean isValidPassword(String userName, String Password, boolean isAdmin) {
+	public boolean isValidPassword(String userName, String Password) {
 		String toCompare;
-		if (isAdmin) toCompare = AdminsMap.get(userName).getPassword();
+		if (AdminsMap.containsKey(userName)) toCompare = AdminsMap.get(userName).getPassword();
 		else toCompare = StudentsMap.get(userName).getPassword();
 		return Password.equals(toCompare);
 	}
 
-	public boolean isExist(int numOfCourse) {
+	public boolean isCourseExist(int numOfCourse) {
 		return CoursesMap.containsKey(numOfCourse);
 	}
 
@@ -108,9 +109,9 @@ public class Database {
 		return result;
 	}
 
-	public boolean isAdmin(String username) {
-		return user instanceof Admin;
-	}
+//	public boolean isAdmin(String username) {
+//		return user instanceof Admin;
+//	}
 
 	public void register(String userName, String Password, boolean isAdmin) {
 		if (isAdmin) {
@@ -133,6 +134,7 @@ public class Database {
 		return CoursesMap.get(numOfCourse).getKdamCoursesList().toString();
 	}
 
+	// ADMIN TODO: erase spaces
 	public String ComposeCourseStat(int numOfCourse) {
 		String output;
 		Course currentCourse = CoursesMap.get(numOfCourse);
@@ -142,14 +144,16 @@ public class Database {
 		return output;
 	}
 
+	// ADMIN TODO: erase spaces
 	public String ComposeStudentStat(String userName) {
 		Student currentStudent = StudentsMap.get(userName);
 		return  "Student: " + currentStudent.getUsername() + "\n" + "Courses: " + currentStudent.getCourses().toString();
 	}
 
-	public boolean courseCheck(String userName, int numOfCourse) {
+	public String courseCheck(String userName, int numOfCourse) {
 		Course course = CoursesMap.get(numOfCourse);
-		return StudentsMap.get(userName).checkCourse(course);
+		if (StudentsMap.get(userName).checkCourse(course)) return "REGISTERED";
+		else return "NOT REGISTERED";
 	}
 
 	public void unregister(String userName, int numOfCourse) {
@@ -162,19 +166,25 @@ public class Database {
 		return StudentsMap.get(userName).getCourses().toString();
 	}
 
-	public void logIn(String username, boolean isAdmin){
-		if (isAdmin) AdminsMap.get(username).setLogIn(true);
-		else StudentsMap.get(username).setLogIn(true);
+	public boolean logIn(String username){
+		if (AdminsMap.containsKey(username)) {
+			Admin admin = AdminsMap.get(username);
+			LoggedInMap.put(username, admin);
+			return true;
+		}
+		else {
+			Student student = StudentsMap.get(username);
+			LoggedInMap.put(username, student);
+			return false;
+		}
 	}
 
-	public void logOut(String username, boolean isAdmin){
-		if (isAdmin) AdminsMap.get(username).setLogIn(false);
-		else StudentsMap.get(username).setLogIn(false);
+	public void logOut(String username){
+		LoggedInMap.remove(username);
 	}
 
-	public boolean isLoggedIn(String username, boolean isAdmin){
-		if (isAdmin) return AdminsMap.get(username).isLogged();
-		else return StudentsMap.get(username).isLogged();
+	public boolean isLoggedIn(String username){
+		return LoggedInMap.containsKey(username);
 	}
 
 	private String getStudentsRegisteredList(Course courseToCheck) {
