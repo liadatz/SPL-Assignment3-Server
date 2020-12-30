@@ -7,12 +7,12 @@ import java.nio.charset.StandardCharsets;
 
 public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
 
-    private final ByteBuffer optBuffer = ByteBuffer.allocate(2);
+    private byte[] shortArray = new byte[2];
     private byte[] stringBytes = new byte[1 << 10];
     private int length = 0;
     private ByteBuffer intBuffer = ByteBuffer.allocate(4); //final?
+    private int optCounter = 0; //can be replaced with length ?
     private int shortCounter = 0; //can be replaced with length ?
-    private int intCounter = 0; //can be replaced with length ?
     private short optNum = 0;
     private String username; //?
     private String password; //?
@@ -20,23 +20,22 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
     @Override
     public Message decodeNextByte(byte nextByte) {
 
-        if (shortCounter < 2){
-            optBuffer.put(nextByte);
-            shortCounter++;
+        if (optCounter < 2){
+            shortArray[optCounter] = nextByte;
+            optCounter++;
             return null;
         }
 
-        if (shortCounter == 2){
-            optBuffer.flip();
-            optNum = optBuffer.getShort();
-            shortCounter++;
-            return null;
+        if (optCounter == 2){
+            optNum = bytesToShort(shortArray);
+            optCounter++;
         }
 
         if (optNum == 4 | optNum == 11){ //opt is 4 or 11
+            Message decoded = new Message(optNum);
             shortCounter = 0;
             optNum = 0;
-            return new Message(optNum);
+            return decoded;
         }
 
         else if (optNum != 0 & optNum < 4 | optNum == 8){ //opt is 1-3 or 8 (decode String)
@@ -50,7 +49,7 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
                 return decoded;
             }
 
-            else if (nextByte == '0'){
+            else if (nextByte == '0'){ //
                 if (username.isEmpty()) {
                     username = new String(stringBytes, 0, length, StandardCharsets.UTF_8);
                 }
@@ -63,9 +62,21 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
         }
 
         else if (optNum != 0){ //opt is 5-7 or 9-10 (decode int)
-            return decodeInt(nextByte);
-        }
+            if (shortCounter < 2){
+                shortArray[shortCounter] = nextByte;
+                shortCounter++;
+                return null;
+            }
 
+            if (shortCounter == 2){
+                Message decoded = new Message(optNum);
+                decoded.setCourseNum(bytesToShort(shortArray));
+                shortCounter = 0;
+                optNum =0;
+                return decoded;
+
+            }
+        }
         return null; // if opNum is still 0 (?)
     }
 
@@ -73,22 +84,14 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
         return null;
     }
 
-    public Message decodeInt(byte nextByte){
-        if (intCounter < 4){
-            intBuffer.put(nextByte);
-            intCounter++;
-            return null;
-        }
 
-        else {
-            Message decoded = new Message(optNum);
-            intBuffer.flip();
-            decoded.setCourseNum(intBuffer.getInt());
-            intCounter = 0;
-            optNum =0;
-            return decoded;
-        }
+    public short bytesToShort(byte[] byteArr)
+    {
+        short result = (short)((byteArr[0] & 0xff) << 8);
+        result += (short)(byteArr[1] & 0xff);
+        return result;
     }
+
 
     @Override
     public byte[] encode(Message message) {
