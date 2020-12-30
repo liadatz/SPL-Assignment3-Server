@@ -1,16 +1,17 @@
 package bgu.spl.net.impl.passiveObjects;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Course {
 /*---------------------------------fields---------------------------------*/
     short courseNum;
     String courseName;
-    List<Course> KdamCoursesList;
+    ArrayList<Course> KdamCoursesList;
     int numOfMaxStudents;
     int numOfRegistered;
 /*-------------------------------constructors------------------------------*/
-    public Course(short courseNum, String courseName, List<Course> kdamCoursesList, int numOfMaxStudents) {
+    public Course(short courseNum, String courseName, ArrayList<Course> kdamCoursesList, int numOfMaxStudents) {
         this.courseNum = courseNum;
         this.courseName = courseName;
         KdamCoursesList = kdamCoursesList;
@@ -26,7 +27,7 @@ public class Course {
         return courseName;
     }
 
-    public List<Course> getKdamCoursesList() {
+    public ArrayList<Course> getKdamCoursesList() {
         return KdamCoursesList;
     }
 

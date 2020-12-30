@@ -5,7 +5,7 @@ public class Message {
     private short opcode; //for all
     private String username; //for adminreg, studentreg, login, logout
     private String password; //for adminreg, studentreg, login, logout
-    private int courseNum; //for coursereg, kdamcheck, coursestat, studentdstat, isregistered, unregister
+    private short courseNum; //for coursereg, kdamcheck, coursestat, studentdstat, isregistered, unregister
     private short msgOpcode; // for error and acknowledge
     private String optional; //for acknowledge
     /*-------------------------------constructors------------------------------*/
@@ -25,7 +25,7 @@ public class Message {
         return password;
     }
 
-    public int getCourseNum() {
+    public short getCourseNum() {
         return courseNum;
     }
 
@@ -46,7 +46,7 @@ public class Message {
         this.password = password;
     }
 
-    public void setCourseNum(int courseNum) {
+    public void setCourseNum(short courseNum) {
         this.courseNum = courseNum;
     }
 

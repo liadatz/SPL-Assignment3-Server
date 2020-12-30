@@ -29,8 +29,9 @@ public class Database {
 
 	private ConcurrentHashMap<String, Student> StudentsMap;
 	private ConcurrentHashMap<String, Admin> AdminsMap;
-	private ConcurrentHashMap<Integer, Course> CoursesMap;
+	private ConcurrentHashMap<Short, Course> CoursesMap;
 	private ConcurrentHashMap<String, User> LoggedInMap;
+	private ArrayList<Short> CoursesList;
 
 	//to prevent user from creating new Database
 	private Database() {
@@ -38,6 +39,7 @@ public class Database {
 		AdminsMap = new ConcurrentHashMap<>();
 		CoursesMap = new ConcurrentHashMap<>();
 		LoggedInMap = new ConcurrentHashMap<>();
+		CoursesList = new ArrayList<>();
 	}
 
 	/**
@@ -61,7 +63,8 @@ public class Database {
 				String[] currentLine = sc.nextLine().split("[|]");
 				Course newCourse = new Course(Short.parseShort(currentLine[0]), currentLine[1], new ArrayList<>(), Integer.parseInt(currentLine[3]));
 				Kdam.append(currentLine[0]).append("|").append(currentLine[2], 1, currentLine[2].length() - 1).append("|");
-				CoursesMap.put(Integer.parseInt(currentLine[0]), newCourse);
+				CoursesMap.put(Short.parseShort(currentLine[0]), newCourse);
+				CoursesList.add(Short.parseShort(currentLine[0]));
 			}
 		}
 		catch (FileNotFoundException e) {
@@ -70,10 +73,10 @@ public class Database {
 		// add Kdam Course for each course
 		String[] couresesAndKdams = Kdam.toString().split("[|]");
 		for (int i = 0; i < couresesAndKdams.length; i = i + 2) {
-			Course currentCourse = CoursesMap.get(Integer.parseInt(couresesAndKdams[i]));
+			Course currentCourse = CoursesMap.get(Short.parseShort(couresesAndKdams[i]));
 			String[] Kdams = couresesAndKdams[i+1].split(",");
 			for (int j = 0; j < Kdams.length && !Kdams[j].equals(""); j++) {
-				currentCourse.addKdamCourse(CoursesMap.get(Integer.parseInt(Kdams[j])));
+				currentCourse.addKdamCourse(CoursesMap.get(Short.parseShort(Kdams[j])));
 			}
 		}
 		return true;
@@ -90,15 +93,15 @@ public class Database {
 		return Password.equals(toCompare);
 	}
 
-	public boolean isCourseExist(int numOfCourse) {
+	public boolean isCourseExist(short numOfCourse) {
 		return CoursesMap.containsKey(numOfCourse);
 	}
 
-	public boolean isRoomAvailable(int numOfCourse) {
+	public boolean isRoomAvailable(short numOfCourse) {
 		return CoursesMap.get(numOfCourse).isRoomAvailable();
 	}
 
-	public boolean isKdamDone(String userName, int numOfCourse) {
+	public boolean isKdamDone(String userName, short numOfCourse) {
 		List<Course> KdamList = CoursesMap.get(numOfCourse).getKdamCoursesList();
 		Student currentStudent = StudentsMap.get(userName);
 		boolean result = true;
@@ -119,51 +122,56 @@ public class Database {
 			AdminsMap.put(userName, newAdmin);
 		}
 		else {
-			Student newStudent = new Student(userName, Password, new ArrayList<Course>()); // maybe change arraylist
+			Student newStudent = new Student(userName, Password, new ArrayList<>()); // maybe change arraylist
 			StudentsMap.put(userName, newStudent);
 		}
 	}
 
-	public void courseRegister(String userName, int numOfCourse) {
+	public void courseRegister(String userName, short numOfCourse) {
 		Course currentCourse = CoursesMap.get(numOfCourse);
 		StudentsMap.get(userName).addCourse(currentCourse);
 		currentCourse.increaseNumOfRegistered();
 	}
 
-	public String KdamCheck(int numOfCourse) {
-		return CoursesMap.get(numOfCourse).getKdamCoursesList().toString();
+	public String KdamCheck(short numOfCourse) {
+		ArrayList<Course> list = CoursesMap.get(numOfCourse).getKdamCoursesList();
+		sortCourses(list);
+		return list.toString().replaceAll("\\s","");
 	}
 
 	// ADMIN TODO: erase spaces
-	public String ComposeCourseStat(int numOfCourse) {
+	public String ComposeCourseStat(short numOfCourse) {
 		String output;
 		Course currentCourse = CoursesMap.get(numOfCourse);
-		output = "Course: (" + numOfCourse + ") " + currentCourse.getCourseName() + "\n"
-				+ currentCourse.getNumOfRegistered() + "/" + currentCourse.getNumOfMaxStudents() + "\n";
+		output = "Course: (" + numOfCourse + ") " + currentCourse.getCourseName() + "\n" +
+				"Seats Available: " + currentCourse.getNumOfRegistered() + "/" + currentCourse.getNumOfMaxStudents() + "\n";
 		output = output + getStudentsRegisteredList(currentCourse);
 		return output;
 	}
 
-	// ADMIN TODO: erase spaces
+	// ADMIN
 	public String ComposeStudentStat(String userName) {
 		Student currentStudent = StudentsMap.get(userName);
-		return  "Student: " + currentStudent.getUsername() + "\n" + "Courses: " + currentStudent.getCourses().toString();
+		ArrayList<Course> toBeSorted = currentStudent.getCourses();
+		sortCourses(toBeSorted);
+		String sortedList = toBeSorted.toString().replaceAll("\\s","");
+		return  "Student: " + currentStudent.getUsername() + "\n" + "Courses: " + sortedList;
 	}
 
-	public String courseCheck(String userName, int numOfCourse) {
+	public String courseCheck(String userName, short numOfCourse) {
 		Course course = CoursesMap.get(numOfCourse);
 		if (StudentsMap.get(userName).checkCourse(course)) return "REGISTERED";
 		else return "NOT REGISTERED";
 	}
 
-	public void unregister(String userName, int numOfCourse) {
+	public void unregister(String userName, short numOfCourse) {
 		Course course = CoursesMap.get(numOfCourse);
 		StudentsMap.get(userName).removeCourse(course);
 	}
 
-	// need to check how to print in a specific order
+	// TODO: need to be in CourseList order?
 	public String myCourses(String userName) {
-		return StudentsMap.get(userName).getCourses().toString();
+		return StudentsMap.get(userName).getCourses().toString().replaceAll("\\s","");
 	}
 
 	public boolean logIn(String username){
@@ -193,7 +201,12 @@ public class Database {
 			if (student.checkCourse(courseToCheck)) registeredStudents.add(student.getUsername());
 		}
 		registeredStudents.sort(Comparator.naturalOrder());
-		return registeredStudents.toString();
+		return registeredStudents.toString().replaceAll("\\s","");
+	}
+
+	private void sortCourses(ArrayList<Course> courses) {
+		Comparator<Course> comparator = Comparator.comparingInt(o -> CoursesList.indexOf(o.getCourseNum()));
+		courses.sort(comparator);
 	}
 
 	// for testing purpose
@@ -201,5 +214,6 @@ public class Database {
 		StudentsMap = new ConcurrentHashMap<>();
 		AdminsMap = new ConcurrentHashMap<>();
 		CoursesMap = new ConcurrentHashMap<>();
+		CoursesList = new ArrayList<>();
 	}
 }

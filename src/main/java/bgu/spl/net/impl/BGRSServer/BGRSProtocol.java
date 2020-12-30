@@ -54,7 +54,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
             case 5:
                 // Check if the student is not logged in, no such course is exist,
                 // no seats are available in this course,the student does not have all the Kdam courses,
-                int CourseNum = msg.getCourseNum();
+                short CourseNum = msg.getCourseNum();
                 if (isLogged && !isAdmin && database.isLoggedIn(userName) && database.isCourseExist(CourseNum)
                         && database.isRoomAvailable(CourseNum) && database.isKdamDone(userName, CourseNum)) {
                     database.courseRegister(userName, CourseNum);
