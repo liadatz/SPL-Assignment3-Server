@@ -27,11 +27,11 @@ public class Database {
 		private static Database instance = new Database();
 	}
 
-	private ConcurrentHashMap<String, Student> StudentsMap;
-	private ConcurrentHashMap<String, Admin> AdminsMap;
-	private ConcurrentHashMap<Short, Course> CoursesMap;
-	private ConcurrentHashMap<String, User> LoggedInMap;
-	private ArrayList<Short> CoursesList;
+	private final ConcurrentHashMap<String, Student> StudentsMap;
+	private final ConcurrentHashMap<String, Admin> AdminsMap;
+	private final ConcurrentHashMap<Short, Course> CoursesMap;
+	private final ConcurrentHashMap<String, User> LoggedInMap;
+	private final ArrayList<Short> CoursesList;
 
 	//to prevent user from creating new Database
 	private Database() {
@@ -112,25 +112,36 @@ public class Database {
 		return result;
 	}
 
-//	public boolean isAdmin(String username) {
-//		return user instanceof Admin;
-//	}
+	public boolean isAdmin(String username) {
+		return AdminsMap.containsKey(username);
+	}
 
-	public void register(String userName, String Password, boolean isAdmin) {
+	public boolean register(String userName, String Password, boolean isAdmin) {
 		if (isAdmin) {
-			Admin newAdmin = new Admin(userName, Password);
-			AdminsMap.put(userName, newAdmin);
+			synchronized (AdminsMap) {
+				if (isRegistered(userName)) return false;
+				Admin newAdmin = new Admin(userName, Password);
+				AdminsMap.put(userName, newAdmin);
+			}
 		}
 		else {
-			Student newStudent = new Student(userName, Password, new ArrayList<>()); // maybe change arraylist
-			StudentsMap.put(userName, newStudent);
+			synchronized (StudentsMap) {
+				if (isRegistered(userName)) return false;
+				Student newStudent = new Student(userName, Password, new ArrayList<>()); // maybe change arraylist
+				StudentsMap.put(userName, newStudent);
+			}
 		}
+		return true;
 	}
 
 	public void courseRegister(String userName, short numOfCourse) {
 		Course currentCourse = CoursesMap.get(numOfCourse);
-		StudentsMap.get(userName).addCourse(currentCourse);
-		currentCourse.increaseNumOfRegistered();
+		synchronized (StudentsMap.get(userName)) {
+			StudentsMap.get(userName).addCourse(currentCourse);
+		}
+		synchronized (CoursesMap.get(numOfCourse)) {
+			currentCourse.increaseNumOfRegistered();
+		}
 	}
 
 	public String KdamCheck(short numOfCourse) {
@@ -139,23 +150,27 @@ public class Database {
 		return list.toString().replaceAll("\\s","");
 	}
 
-	// ADMIN TODO: erase spaces
+
 	public String ComposeCourseStat(short numOfCourse) {
 		String output;
 		Course currentCourse = CoursesMap.get(numOfCourse);
-		output = "Course: (" + numOfCourse + ") " + currentCourse.getCourseName() + "\n" +
-				"Seats Available: " + currentCourse.getNumOfRegistered() + "/" + currentCourse.getNumOfMaxStudents() + "\n";
-		output = output + getStudentsRegisteredList(currentCourse);
+		synchronized (CoursesMap.get(numOfCourse)) {
+			output = "Course: (" + numOfCourse + ") " + currentCourse.getCourseName() + "\n" +
+					"Seats Available: " + currentCourse.getNumOfRegistered() + "/" + currentCourse.getNumOfMaxStudents() + "\n";
+			output = output + getStudentsRegisteredList(currentCourse);
+		}
 		return output;
 	}
 
 	// ADMIN
 	public String ComposeStudentStat(String userName) {
 		Student currentStudent = StudentsMap.get(userName);
-		ArrayList<Course> toBeSorted = currentStudent.getCourses();
-		sortCourses(toBeSorted);
-		String sortedList = toBeSorted.toString().replaceAll("\\s","");
-		return  "Student: " + currentStudent.getUsername() + "\n" + "Courses: " + sortedList;
+		synchronized (StudentsMap.get(userName)) {
+			ArrayList<Course> toBeSorted = currentStudent.getCourses();
+			sortCourses(toBeSorted);
+			String sortedList = toBeSorted.toString().replaceAll("\\s", "");
+			return "Student: " + currentStudent.getUsername() + "\n" + "Courses: " + sortedList;
+		}
 	}
 
 	public String courseCheck(String userName, short numOfCourse) {
@@ -166,7 +181,12 @@ public class Database {
 
 	public void unregister(String userName, short numOfCourse) {
 		Course course = CoursesMap.get(numOfCourse);
-		StudentsMap.get(userName).removeCourse(course);
+		synchronized (StudentsMap.get(userName)) {
+			StudentsMap.get(userName).removeCourse(course);
+		}
+		synchronized (CoursesMap.get(numOfCourse)) {
+			course.decreaseNumOfRegistered();
+		}
 	}
 
 	// TODO: need to be in CourseList order?
@@ -175,14 +195,17 @@ public class Database {
 	}
 
 	public boolean logIn(String username){
-		if (AdminsMap.containsKey(username)) {
-			Admin admin = AdminsMap.get(username);
-			LoggedInMap.put(username, admin);
-			return true;
-		}
-		else {
-			Student student = StudentsMap.get(username);
-			LoggedInMap.put(username, student);
+		synchronized (LoggedInMap) {
+			if (!isLoggedIn(username)) {
+				if (AdminsMap.containsKey(username)) {
+					Admin admin = AdminsMap.get(username);
+					LoggedInMap.put(username, admin);
+				} else {
+					Student student = StudentsMap.get(username);
+					LoggedInMap.put(username, student);
+				}
+				return true;
+			}
 			return false;
 		}
 	}
@@ -198,7 +221,10 @@ public class Database {
 	private String getStudentsRegisteredList(Course courseToCheck) {
 		ArrayList<String> registeredStudents = new ArrayList<>();
 		for (Student student : StudentsMap.values()) {
-			if (student.checkCourse(courseToCheck)) registeredStudents.add(student.getUsername());
+			// TODO: improve lock
+			synchronized (StudentsMap.get(student.getUsername())) {
+				if (student.checkCourse(courseToCheck)) registeredStudents.add(student.getUsername());
+			}
 		}
 		registeredStudents.sort(Comparator.naturalOrder());
 		return registeredStudents.toString().replaceAll("\\s","");
@@ -211,9 +237,9 @@ public class Database {
 
 	// for testing purpose
 	public void clear(){
-		StudentsMap = new ConcurrentHashMap<>();
-		AdminsMap = new ConcurrentHashMap<>();
-		CoursesMap = new ConcurrentHashMap<>();
-		CoursesList = new ArrayList<>();
+		StudentsMap.clear();
+		AdminsMap.clear();
+		CoursesMap.clear();
+		CoursesList.clear();
 	}
 }

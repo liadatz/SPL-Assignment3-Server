@@ -10,6 +10,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
     private String Password;
     private Boolean isAdmin;
     private boolean isLogged; // client may terminate after logOut, maybe not needed
+    private boolean shouldTerminate = false;
 
     @Override
     public Message process(Message msg) {
@@ -17,22 +18,20 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
         Message answer = null;
         switch (opCode) {
             case 1:
-                if (!database.isRegistered(msg.getUsername())) {
-                    database.register(msg.getUsername(), msg.getPassword(), true);
+                if (database.register(msg.getUsername(), msg.getPassword(), true)) {
                     answer = composeACK(opCode, null);
                 }
             case 2:
-                if (!database.isRegistered(msg.getUsername())) {
-                    database.register(msg.getUsername(), msg.getPassword(), false);
+                if (database.register(msg.getUsername(), msg.getPassword(), false)) {
                     answer = composeACK(opCode, null);
                 }
             case 3:
                 // Check if Protocol already used login, if User is registered,
                 // if User is already login somewhere else and if password is matching username
-                if (!isLogged && database.isRegistered(msg.getUsername()) && !database.isLoggedIn(msg.getUsername())
-                        && database.isValidPassword(msg.getUsername(), msg.getPassword())) {
-                    isAdmin = database.logIn(msg.getUsername());
+                if (!isLogged && database.isRegistered(msg.getUsername()) && database.isValidPassword(msg.getUsername(), msg.getPassword())
+                    &&  database.logIn(msg.getUsername())){
                     // update data in Protocol
+                    isAdmin = database.isAdmin(userName);
                     userName = msg.getUsername();
                     Password = msg.getPassword();
                     isLogged = true;
@@ -49,6 +48,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                     Password = null;
                     isLogged = false;
                     isAdmin = null;
+                    shouldTerminate = true;
                     answer = composeACK(opCode, null);
                 }
             case 5:
@@ -112,6 +112,6 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
     }
 
     public boolean shouldTerminate() {
-        return false;
+        return shouldTerminate;
     }
 }

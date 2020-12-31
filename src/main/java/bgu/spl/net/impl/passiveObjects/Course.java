@@ -44,6 +44,10 @@ public class Course {
         if (numOfRegistered < numOfMaxStudents) numOfRegistered++;
     }
 
+    public void decreaseNumOfRegistered(){
+        numOfRegistered--;
+    }
+
     public boolean isRoomAvailable(){
         return numOfRegistered < numOfMaxStudents;
     }
