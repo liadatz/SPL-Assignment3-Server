@@ -13,6 +13,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Passive object representing the Database where all courses and users are stored.

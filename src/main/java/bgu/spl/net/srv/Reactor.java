@@ -33,6 +33,7 @@ public class Reactor<T> implements Server<T> {
         this.port = port;
         this.protocolFactory = protocolFactory;
         this.readerFactory = readerFactory;
+        Database.getInstance().initialize("Courses.txt");
     }
 
     @Override
