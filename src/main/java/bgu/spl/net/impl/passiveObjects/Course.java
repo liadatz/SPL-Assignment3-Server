@@ -1,7 +1,6 @@
 package bgu.spl.net.impl.passiveObjects;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Course {
 /*---------------------------------fields---------------------------------*/

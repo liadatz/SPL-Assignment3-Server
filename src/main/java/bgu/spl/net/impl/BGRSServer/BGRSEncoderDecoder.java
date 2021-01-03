@@ -21,24 +21,24 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
     public Message decodeNextByte(byte nextByte) {
         //decoding opt
 
-        if (optCounter < 2){
+        if (optCounter < 2) {
             shortBytes[optCounter] = nextByte;
             optCounter++;
-            return null;
-        }
-
-        if (optCounter == 2){
-            optNum = bytesToShort(shortBytes);
-            optCounter++;
+            if (optCounter == 2) {
+                optNum = bytesToShort(shortBytes);
+                System.out.println(optNum);
+                optCounter++;
+                if (optNum == 4 | optNum == 11){ //opt is 4 or 11 TODO: make prettier
+                    Message decoded = new Message(optNum);
+                    shortCounter = 0;
+                    optNum = 0;
+                    clear();
+                    return decoded;
+                }
+                return null;
+            }
         }
         //decoding rest of the message
-
-        if (optNum == 4 | optNum == 11){ //opt is 4 or 11
-            Message decoded = new Message(optNum);
-            shortCounter = 0;
-            optNum = 0;
-            return decoded;
-        }
 
         else if (optNum != 0 & optNum < 4 | optNum == 8) { //opt is 1-3 or 8 (decode String)
             return decodeString(nextByte);
@@ -48,15 +48,13 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
             if (shortCounter < 2){
                 shortBytes[shortCounter] = nextByte;
                 shortCounter++;
+                if (shortCounter == 2){
+                    Message decoded = new Message(optNum);
+                    decoded.setCourseNum(bytesToShort(shortBytes));
+                    clear();
+                    return decoded;
+                }
                 return null;
-            }
-
-            if (shortCounter == 2){
-                Message decoded = new Message(optNum);
-                decoded.setCourseNum(bytesToShort(shortBytes));
-                shortCounter = 0;
-                optNum =0;
-                return decoded;
             }
         }
         return null; // if opNum is still 0 (?)
@@ -70,13 +68,15 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
     }
 
     public Message decodeString(byte nextByte){
-        if (nextByte == '0' & username.isEmpty()) {
+        if (nextByte == '\0' & username.isEmpty()) {
             username = new String(stringBytes, 0, stringBytesLength, StandardCharsets.UTF_8);
+            stringBytesLength = 0;
             if (optNum == 8) return composeMessage();
             else return null;
         }
-        else if (nextByte == '0') {
+        else if (nextByte == '\0') {
             password = new String(stringBytes, 0, stringBytesLength, StandardCharsets.UTF_8);
+            stringBytesLength = 0;
             return composeMessage();
         }
         else {
@@ -90,17 +90,9 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
         Message decoded = new Message(optNum);
         decoded.setUsername(username);
         decoded.setPassword(password);
-        optNum = 0;
-        username = "";
-        password = "";
+        clear();
+        System.out.println(username + " " + password);
         return decoded;
-    }
-
-    public byte[] shortToBytes(short num) {
-        byte[] bytesArr = new byte[2];
-        bytesArr[0] = (byte)((num >> 8) & 0xFF);
-        bytesArr[1] = (byte)(num & 0xFF);
-        return bytesArr;
     }
 
     @Override
@@ -131,5 +123,23 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
         encoded.put(opcode);
         encoded.put(messageOpcode);
         return encoded.array();
+    }
+
+    private byte[] shortToBytes(short num) {
+        byte[] bytesArr = new byte[2];
+        bytesArr[0] = (byte)((num >> 8) & 0xFF);
+        bytesArr[1] = (byte)(num & 0xFF);
+        return bytesArr;
+    }
+
+    private void clear(){
+        shortBytes = new byte[2];
+        stringBytes = new byte[1 << 10];
+        optCounter = 0;
+        shortCounter = 0;
+        stringBytesLength = 0;
+        optNum = 0;
+        username = "";
+        password = "";
     }
 }

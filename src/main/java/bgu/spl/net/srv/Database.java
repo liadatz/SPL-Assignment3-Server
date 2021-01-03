@@ -13,8 +13,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Passive object representing the Database where all courses and users are stored.
@@ -148,7 +146,6 @@ public class Database {
 
 	public String KdamCheck(short numOfCourse) {
 		ArrayList<Course> list = CoursesMap.get(numOfCourse).getKdamCoursesList();
-		sortCourses(list);
 		return list.toString().replaceAll("\\s","");
 	}
 
@@ -232,6 +229,7 @@ public class Database {
 		return registeredStudents.toString().replaceAll("\\s","");
 	}
 
+	// TODO: sort by other array
 	private void sortCourses(ArrayList<Course> courses) {
 		Comparator<Course> comparator = Comparator.comparingInt(o -> CoursesList.indexOf(o.getCourseNum()));
 		courses.sort(comparator);

@@ -23,7 +23,7 @@ public abstract class BaseServer<T> implements Server<T> {
         this.protocolFactory = protocolFactory;
         this.encdecFactory = encdecFactory;
 		this.sock = null;
-		Database.getInstance().initialize("Courses.txt");
+		Database.getInstance().initialize("Courses.txt"); // TODO: what to do when get false
     }
 
     @Override
@@ -37,6 +37,7 @@ public abstract class BaseServer<T> implements Server<T> {
             while (!Thread.currentThread().isInterrupted()) {
 
                 Socket clientSock = serverSock.accept();
+                System.out.println("client accepted"); // TODO: delete
 
                 BlockingConnectionHandler<T> handler = new BlockingConnectionHandler<>(
                         clientSock,

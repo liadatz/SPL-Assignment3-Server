@@ -9,7 +9,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
     private String userName;
     private String Password;
     private Boolean isAdmin;
-    private boolean isLogged; // client may terminate after logOut, maybe not needed
+    private boolean isLogged = false; // client may terminate after logOut, maybe not needed
     private boolean shouldTerminate = false;
 
     @Override
@@ -21,27 +21,29 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                 if (database.register(msg.getUsername(), msg.getPassword(), true)) {
                     answer = composeACK(opCode, null);
                 }
+                break;
             case 2:
                 if (database.register(msg.getUsername(), msg.getPassword(), false)) {
                     answer = composeACK(opCode, null);
                 }
+                break;
             case 3:
                 // Check if Protocol already used login, if User is registered,
                 // if User is already login somewhere else and if password is matching username
                 if (!isLogged && database.isRegistered(msg.getUsername()) && database.isValidPassword(msg.getUsername(), msg.getPassword())
                     &&  database.logIn(msg.getUsername())){
                     // update data in Protocol
-                    isAdmin = database.isAdmin(userName);
                     userName = msg.getUsername();
                     Password = msg.getPassword();
+                    isAdmin = database.isAdmin(userName);
                     isLogged = true;
                     answer = composeACK(opCode, null);
                 }
+                break;
             case 4:
                 // Check if Protocol already used login, if Protocol data is matching msg info
                 // and if User is Logged in database
-                if (isLogged && userName.equals(msg.getUsername()) && Password.equals(msg.getPassword())
-                        && database.isLoggedIn(msg.getUsername())) {
+                if (isLogged  && database.isLoggedIn(userName)) {
                     database.logOut(userName);
                     // erase data from Protocol
                     userName = null;
@@ -51,51 +53,61 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                     shouldTerminate = true;
                     answer = composeACK(opCode, null);
                 }
+                break;
             case 5:
                 // Check if the student is not logged in, no such course is exist,
                 // no seats are available in this course,the student does not have all the Kdam courses,
+                // and student not registered to course
                 short CourseNum = msg.getCourseNum();
                 if (isLogged && !isAdmin && database.isLoggedIn(userName) && database.isCourseExist(CourseNum)
-                        && database.isRoomAvailable(CourseNum) && database.isKdamDone(userName, CourseNum)) {
-                    database.courseRegister(userName, CourseNum);
+                        && database.courseCheck(userName, msg.getCourseNum()).equals("NOT REGISTERED") &&
+                        database.isRoomAvailable(CourseNum) && database.isKdamDone(userName, CourseNum)) {
+                        database.courseRegister(userName, CourseNum);
                     answer = composeACK(opCode, null);
                 }
-            case 6: // TODO: check if user to be logged in for using it
+                break;
+            case 6:
                 // Check if Course is exist
-                if (database.isCourseExist(msg.getCourseNum())) {
+                if (isLogged && database.isCourseExist(msg.getCourseNum())) {
                     String toAttach = database.KdamCheck(msg.getCourseNum());
                     answer = composeACK(opCode, toAttach);
                 }
+                break;
             case 7:
                 // Check if User is Admin
-                if (isAdmin) {
+                if (isLogged && isAdmin) {
                     String toAttach = database.ComposeCourseStat(msg.getCourseNum());
                     answer = composeACK(opCode, toAttach);
                 }
+                break;
             case 8:
                 // Check if User is Admin
-                if (isAdmin) {
+                if (isLogged && isAdmin) {
                     String toAttach = database.ComposeStudentStat(msg.getUsername());
                     answer = composeACK(opCode, toAttach);
                 }
+                break;
             case 9:
                 // Check if User is not Admin and if user is logged in
-                if (!isAdmin && database.isLoggedIn(userName)) {
+                if (isLogged && !isAdmin && database.isLoggedIn(userName)) {
                     String toAttach = database.courseCheck(userName, msg.getCourseNum());
                     answer = composeACK(opCode, toAttach);
                 }
+                break;
             case 10:
                 // Check if User is not Admin and if user is logged in
-                if (!isAdmin && database.isLoggedIn(userName)) {
+                if (isLogged && !isAdmin && database.isLoggedIn(userName) && database.courseCheck(userName, msg.getCourseNum()).equals("REGISTERED")) {
                     database.unregister(userName, msg.getCourseNum());
                     answer = composeACK(opCode, null);
                 }
+                break;
             case 11:
                 // Check if User is not Admin and if user is logged in
-                if (!isAdmin && database.isLoggedIn(userName)) {
+                if (isLogged && !isAdmin && database.isLoggedIn(userName)) {
                     String toAttach = database.myCourses(userName);
                     answer = composeACK(opCode, toAttach);
                 }
+                break;
         }
         if (answer == null) {
             answer = new Message((short) 13);
