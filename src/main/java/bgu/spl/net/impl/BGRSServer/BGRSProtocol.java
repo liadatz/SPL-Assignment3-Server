@@ -82,7 +82,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                 break;
             case 8:
                 // Check if User is Admin
-                if (isLogged && isAdmin) {
+                if (isLogged && isAdmin && database.isStudentExist(msg.getUsername())) {
                     String toAttach = database.ComposeStudentStat(msg.getUsername());
                     answer = composeACK(opCode, toAttach);
                 }

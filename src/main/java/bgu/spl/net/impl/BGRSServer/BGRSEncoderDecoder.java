@@ -26,7 +26,6 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
             optCounter++;
             if (optCounter == 2) {
                 optNum = bytesToShort(shortBytes);
-                System.out.println(optNum);
                 optCounter++;
                 if (optNum == 4 | optNum == 11){ //opt is 4 or 11 TODO: make prettier
                     Message decoded = new Message(optNum);
@@ -91,7 +90,6 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
         decoded.setUsername(username);
         decoded.setPassword(password);
         clear();
-        System.out.println(username + " " + password);
         return decoded;
     }
 

@@ -86,6 +86,10 @@ public class Database {
 		return AdminsMap.containsKey(userName) || StudentsMap.containsKey(userName);
 	}
 
+	public boolean isStudentExist(String userName) {
+		return StudentsMap.containsKey(userName);
+	}
+
 	public boolean isValidPassword(String userName, String Password) {
 		String toCompare;
 		if (AdminsMap.containsKey(userName)) toCompare = AdminsMap.get(userName).getPassword();
