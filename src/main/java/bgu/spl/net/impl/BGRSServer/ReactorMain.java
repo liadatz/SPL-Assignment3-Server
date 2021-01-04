@@ -11,7 +11,8 @@ public class ReactorMain {
                     Integer.parseInt(args[0]),
                     () -> new BGRSProtocol(),
                     () -> new BGRSEncoderDecoder());
-            server.serve();
+            if (Database.getInstance().initialize("Courses.txt")) server.serve();
+            else System.out.println("No Course file found");
         }
         else{
             System.out.print("no arguments");

@@ -2,7 +2,6 @@ package bgu.spl.net.impl.BGRSServer;
 
 import bgu.spl.net.api.MessagingProtocol;
 import bgu.spl.net.impl.Messages.Message;
-import bgu.spl.net.srv.Database;
 
 public class BGRSProtocol implements MessagingProtocol<Message> {
     private Database database = Database.getInstance();

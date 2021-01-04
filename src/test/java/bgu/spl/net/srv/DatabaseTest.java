@@ -1,12 +1,9 @@
 package bgu.spl.net.srv;
 
-import bgu.spl.net.impl.passiveObjects.Admin;
-import bgu.spl.net.impl.passiveObjects.Student;
+import bgu.spl.net.impl.BGRSServer.Database;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,7 +12,7 @@ class DatabaseTest {
 
     @BeforeEach
     void setUp(){
-        database.initialize("C:\\Users\\ASUS\\IntelliJProjects\\Assignment3\\Server\\Courses.txt");
+//        database.initialize("C:\\Users\\ASUS\\IntelliJProjects\\Assignment3\\Server\\Courses.txt");
     }
 
     @AfterEach

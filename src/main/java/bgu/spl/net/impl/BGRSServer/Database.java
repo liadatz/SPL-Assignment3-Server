@@ -1,4 +1,4 @@
-package bgu.spl.net.srv;
+package bgu.spl.net.impl.BGRSServer;
 
 
 import bgu.spl.net.impl.passiveObjects.Admin;
@@ -53,7 +53,7 @@ public class Database {
 	 * loades the courses from the file path specified 
 	 * into the Database, returns true if successful.
 	 */
-	boolean initialize(String coursesFilePath) {
+		boolean initialize(String coursesFilePath) {
 		// read file from Path
 		File file = new File(coursesFilePath);
 		StringBuilder Kdam = new StringBuilder();
