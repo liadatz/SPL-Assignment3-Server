@@ -1,6 +1,5 @@
 package bgu.spl.net.impl.BGRSServer.Tester;
 
-import bgu.spl.net.impl.BGRSServer.Database;
 import bgu.spl.net.impl.BGRSServer.TPCMain;
 
 import java.nio.charset.Charset;
@@ -14,7 +13,6 @@ public class Tests implements Runnable {
 
     private final int         numThreads = 20;
     private ArrayList<Course> courses    = new ArrayList<>();
-    Database database = Database.getInstance();
 
     public ArrayList<CommandProcessor> initiateProcesses(int numProcesses) {
         ArrayList<CommandProcessor> commandsProcessors = new ArrayList<>();

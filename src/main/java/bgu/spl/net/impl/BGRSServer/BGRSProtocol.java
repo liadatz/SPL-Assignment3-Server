@@ -60,8 +60,7 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
                 short CourseNum = msg.getCourseNum();
                 if (isLogged && !isAdmin && database.isLoggedIn(userName) && database.isCourseExist(CourseNum)
                         && database.courseCheck(userName, msg.getCourseNum()).equals("NOT REGISTERED") &&
-                        database.isRoomAvailable(CourseNum) && database.isKdamDone(userName, CourseNum)) {
-                        database.courseRegister(userName, CourseNum);
+                        database.isKdamDone(userName, CourseNum) && database.courseRegister(userName, CourseNum)) {
                     answer = composeACK(opCode, null);
                 }
                 break;

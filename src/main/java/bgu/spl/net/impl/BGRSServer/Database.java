@@ -138,13 +138,17 @@ public class Database {
 		return true;
 	}
 
-	public void courseRegister(String userName, short numOfCourse) {
+	public boolean courseRegister(String userName, short numOfCourse) {
 		Course currentCourse = CoursesMap.get(numOfCourse);
-		synchronized (StudentsMap.get(userName)) {
-			StudentsMap.get(userName).addCourse(currentCourse);
-		}
 		synchronized (CoursesMap.get(numOfCourse)) {
-			currentCourse.increaseNumOfRegistered();
+			if (currentCourse.isRoomAvailable()) {
+				synchronized (StudentsMap.get(userName)) {
+					StudentsMap.get(userName).addCourse(currentCourse);
+				}
+				currentCourse.increaseNumOfRegistered();
+				return true;
+			}
+			else return false;
 		}
 	}
 
@@ -244,6 +248,7 @@ public class Database {
 		StudentsMap.clear();
 		AdminsMap.clear();
 		CoursesMap.clear();
+		LoggedInMap.clear();
 		CoursesList.clear();
 	}
 }

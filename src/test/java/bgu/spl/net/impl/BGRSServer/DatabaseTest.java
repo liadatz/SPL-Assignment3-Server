@@ -1,4 +1,4 @@
-package bgu.spl.net.srv;
+package bgu.spl.net.impl.BGRSServer;
 
 import bgu.spl.net.impl.BGRSServer.Database;
 import org.junit.jupiter.api.AfterEach;
@@ -12,7 +12,7 @@ class DatabaseTest {
 
     @BeforeEach
     void setUp(){
-//        database.initialize("C:\\Users\\ASUS\\IntelliJProjects\\Assignment3\\Server\\Courses.txt");
+        database.initialize("C:\\Users\\ASUS\\IntelliJProjects\\Assignment3\\Server\\Courses.txt");
     }
 
     @AfterEach
