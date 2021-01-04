@@ -59,7 +59,9 @@ public class Course {
         KdamCoursesList.add(courseToAdd);
     }
 
-
+    public int getAvailableSeats(){
+        return numOfMaxStudents - numOfRegistered;
+    }
 }
 
 

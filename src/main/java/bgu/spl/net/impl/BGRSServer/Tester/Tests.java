@@ -1,5 +1,6 @@
 package bgu.spl.net.impl.BGRSServer.Tester;
 
+import bgu.spl.net.impl.BGRSServer.Database;
 import bgu.spl.net.impl.BGRSServer.TPCMain;
 
 import java.nio.charset.Charset;
@@ -13,6 +14,7 @@ public class Tests implements Runnable {
 
     private final int         numThreads = 20;
     private ArrayList<Course> courses    = new ArrayList<>();
+    Database database = Database.getInstance();
 
     public ArrayList<CommandProcessor> initiateProcesses(int numProcesses) {
         ArrayList<CommandProcessor> commandsProcessors = new ArrayList<>();
@@ -454,7 +456,7 @@ public class Tests implements Runnable {
         String studentsL  = tokens[3];
 
         if (!ack.equals("ACK 7")||!courseName.equals("Course: ("+p.getCourseNum()+") "+p.getCourseName())
-                ||!seats.equals("Seats Available: "+"0/"+numOfThreads)||!studentsL.equals(students))
+                ||!seats.equals("Seats Available: "+"0/"+numOfThreads)||!(studentsL).equals(students))
             return "CourseStat Test - Failed";
         CommandProcessor commandProcessorOfStudent=new CommandProcessor();
         commandProcessorOfStudent.initialize();

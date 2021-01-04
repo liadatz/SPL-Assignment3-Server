@@ -62,7 +62,7 @@ public class Database {
 			while(sc.hasNextLine()) {
 				String[] currentLine = sc.nextLine().split("[|]");
 				Course newCourse = new Course(Short.parseShort(currentLine[0]), currentLine[1], new ArrayList<>(), Integer.parseInt(currentLine[3]));
-				Kdam.append(currentLine[0]).append("|").append(currentLine[2], 1, currentLine[2].length() - 1).append("|");
+				Kdam.append(currentLine[0]).append("|").append(currentLine[2]).append("|");
 				CoursesMap.put(Short.parseShort(currentLine[0]), newCourse);
 				CoursesList.add(Short.parseShort(currentLine[0]));
 			}
@@ -74,7 +74,7 @@ public class Database {
 		String[] couresesAndKdams = Kdam.toString().split("[|]");
 		for (int i = 0; i < couresesAndKdams.length; i = i + 2) {
 			Course currentCourse = CoursesMap.get(Short.parseShort(couresesAndKdams[i]));
-			String[] Kdams = couresesAndKdams[i+1].split(",");
+			String[] Kdams = couresesAndKdams[i+1].substring(1,couresesAndKdams[i+1].length()-1).split(",");
 			for (int j = 0; j < Kdams.length && !Kdams[j].equals(""); j++) {
 				currentCourse.addKdamCourse(CoursesMap.get(Short.parseShort(Kdams[j])));
 			}
@@ -159,7 +159,7 @@ public class Database {
 		Course currentCourse = CoursesMap.get(numOfCourse);
 		synchronized (CoursesMap.get(numOfCourse)) {
 			output = "Course: (" + numOfCourse + ") " + currentCourse.getCourseName() + "\n" +
-					"Seats Available: " + currentCourse.getNumOfRegistered() + "/" + currentCourse.getNumOfMaxStudents() + "\n";
+					"Seats Available: " + currentCourse.getAvailableSeats() + "/" + currentCourse.getNumOfMaxStudents() + "\n";
 			output = output + getStudentsRegisteredList(currentCourse);
 		}
 		return output;
@@ -221,7 +221,7 @@ public class Database {
 		return LoggedInMap.containsKey(username);
 	}
 
-	private String getStudentsRegisteredList(Course courseToCheck) {
+	private String getStudentsRegisteredList(Course courseToCheck) { // TODO: set to private
 		ArrayList<String> registeredStudents = new ArrayList<>();
 		for (Student student : StudentsMap.values()) {
 			// TODO: improve lock
@@ -230,7 +230,7 @@ public class Database {
 			}
 		}
 		registeredStudents.sort(Comparator.naturalOrder());
-		return registeredStudents.toString().replaceAll("\\s","");
+		return "Students Registered: " + registeredStudents.toString().replaceAll("\\s","");
 	}
 
 	// TODO: sort by other array

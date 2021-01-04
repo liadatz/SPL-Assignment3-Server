@@ -17,12 +17,12 @@ public class BGRSProtocol implements MessagingProtocol<Message> {
         Message answer = null;
         switch (opCode) {
             case 1:
-                if (database.register(msg.getUsername(), msg.getPassword(), true)) {
+                if (!isLogged && database.register(msg.getUsername(), msg.getPassword(), true)) {
                     answer = composeACK(opCode, null);
                 }
                 break;
             case 2:
-                if (database.register(msg.getUsername(), msg.getPassword(), false)) {
+                if (!isLogged && database.register(msg.getUsername(), msg.getPassword(), false)) {
                     answer = composeACK(opCode, null);
                 }
                 break;

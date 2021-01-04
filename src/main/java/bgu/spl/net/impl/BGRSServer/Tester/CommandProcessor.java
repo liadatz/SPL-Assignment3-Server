@@ -17,7 +17,7 @@ public class CommandProcessor {
 
     public void initialize() {
         try {
-            String binName = "BGRSclient 127.0.0.1 7777";
+            String binName = "./BGRSclient 127.0.0.1 7777";
             consoleProcess = Runtime.getRuntime().exec(binName);
             consoleReader = new StreamReader(
                     consoleProcess.getInputStream());
