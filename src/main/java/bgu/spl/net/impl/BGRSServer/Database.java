@@ -196,9 +196,10 @@ public class Database {
 		}
 	}
 
-	// TODO: need to be in CourseList order?
 	public String myCourses(String userName) {
-		return StudentsMap.get(userName).getCourses().toString().replaceAll("\\s","");
+		ArrayList<Course> myCourses = StudentsMap.get(userName).getCourses();
+		sortCourses(myCourses);
+		return myCourses.toString().replaceAll("\\s","");
 	}
 
 	public boolean logIn(String username){
@@ -225,10 +226,9 @@ public class Database {
 		return LoggedInMap.containsKey(username);
 	}
 
-	private String getStudentsRegisteredList(Course courseToCheck) { // TODO: set to private
+	private String getStudentsRegisteredList(Course courseToCheck) {
 		ArrayList<String> registeredStudents = new ArrayList<>();
 		for (Student student : StudentsMap.values()) {
-			// TODO: improve lock
 			synchronized (StudentsMap.get(student.getUsername())) {
 				if (student.checkCourse(courseToCheck)) registeredStudents.add(student.getUsername());
 			}
@@ -237,7 +237,6 @@ public class Database {
 		return "Students Registered: " + registeredStudents.toString().replaceAll("\\s","");
 	}
 
-	// TODO: sort by other array
 	private void sortCourses(ArrayList<Course> courses) {
 		Comparator<Course> comparator = Comparator.comparingInt(o -> CoursesList.indexOf(o.getCourseNum()));
 		courses.sort(comparator);
