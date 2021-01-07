@@ -1,4 +1,4 @@
-package bgu.spl.net.impl.Messages;
+package bgu.spl.net.impl.BGRSServer;
 
 public class Message {
     /*---------------------------------fields---------------------------------*/

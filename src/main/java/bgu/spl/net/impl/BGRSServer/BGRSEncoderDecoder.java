@@ -1,12 +1,14 @@
 package bgu.spl.net.impl.BGRSServer;
 
 import bgu.spl.net.api.MessageEncoderDecoder;
-import bgu.spl.net.impl.Messages.Message;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
+    /**
+     *
+     */
 
     private byte[] shortBytes = new byte[2];
     private byte[] stringBytes = new byte[1 << 10];
@@ -18,6 +20,7 @@ public class BGRSEncoderDecoder implements MessageEncoderDecoder<Message> {
     private String password = "";
 
     @Override
+
     public Message decodeNextByte(byte nextByte) {
         //decoding opt
 

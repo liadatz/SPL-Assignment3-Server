@@ -82,14 +82,27 @@ public class Database {
 		return true;
 	}
 
+	/**
+	 * checks if this username is already registered
+	 * @param userName is the username we check if registered
+	 * @return true if registered to database and false
+	 */
 	public boolean isRegistered(String userName) {
 		return AdminsMap.containsKey(userName) || StudentsMap.containsKey(userName);
 	}
 
+	/**
+	 *
+	 * @param userName is the student we want to check
+	 * @return true if the {@link Student} username exists in the students hashmap
+	 */
 	public boolean isStudentExist(String userName) {
 		return StudentsMap.containsKey(userName);
 	}
 
+	/**
+	 * @return true if {@param password} is the valid password for the student that holds {@param username}
+	 */
 	public boolean isValidPassword(String userName, String Password) {
 		String toCompare;
 		if (AdminsMap.containsKey(userName)) toCompare = AdminsMap.get(userName).getPassword();
@@ -97,14 +110,16 @@ public class Database {
 		return Password.equals(toCompare);
 	}
 
+	/**
+	 * @return true if {@param numOfCourse} exists in the the courses map
+	 */
 	public boolean isCourseExist(short numOfCourse) {
 		return CoursesMap.containsKey(numOfCourse);
 	}
 
-	public boolean isRoomAvailable(short numOfCourse) {
-		return CoursesMap.get(numOfCourse).isRoomAvailable();
-	}
-
+	/**
+	 * @return true if {@param userName} completed all the 'kdam' {@link Course} required for {@param numOfCourse}
+	 */
 	public boolean isKdamDone(String userName, short numOfCourse) {
 		List<Course> KdamList = CoursesMap.get(numOfCourse).getKdamCoursesList();
 		Student currentStudent = StudentsMap.get(userName);
@@ -116,10 +131,20 @@ public class Database {
 		return result;
 	}
 
+	/**
+	 * @return true if {@param username} is registered as {@link Admin}
+	 */
 	public boolean isAdmin(String username) {
 		return AdminsMap.containsKey(username);
 	}
 
+	/**
+	 * register a new User to the database
+	 * @param userName: the {@link User} we want to register
+	 * @param Password: the password will be needed for this student to log in
+	 * @param isAdmin: determines if the {@link User} will be added to {@param AdminMap} or to {@param StudentMap}
+	 * @return true if the user was successfully registered
+	 */
 	public boolean register(String userName, String Password, boolean isAdmin) {
 		if (isAdmin) {
 			synchronized (AdminsMap) {
@@ -138,6 +163,12 @@ public class Database {
 		return true;
 	}
 
+	/**
+	 * adds a course to a students list of courses in case there is room available in this course
+	 * @param userName: the {@link Student} that takes the course
+	 * @param numOfCourse: {@link Course} that need to be added
+	 * @return true if the course successfully added
+	 */
 	public boolean courseRegister(String userName, short numOfCourse) {
 		Course currentCourse = CoursesMap.get(numOfCourse);
 		synchronized (CoursesMap.get(numOfCourse)) {
@@ -152,12 +183,21 @@ public class Database {
 		}
 	}
 
+	/**
+	 *
+	 * @param numOfCourse: the {@link Course} we want to check it's kdam courses
+	 * @return a list of all the kdam {@link Course} required for the specific course.
+	 */
 	public String KdamCheck(short numOfCourse) {
 		ArrayList<Course> list = CoursesMap.get(numOfCourse).getKdamCoursesList();
 		return list.toString().replaceAll("\\s","");
 	}
 
-
+	/**
+	 * composes Course status: course number, course name, number of available seats, list of registered students.
+	 * @param numOfCourse: the number of the {@link Course} it's status will be returned
+	 * @return the status as String
+	 */
 	public String ComposeCourseStat(short numOfCourse) {
 		String output;
 		Course currentCourse = CoursesMap.get(numOfCourse);
@@ -169,8 +209,11 @@ public class Database {
 		return output;
 	}
 
-	// ADMIN
-	public String ComposeStudentStat(String userName) {
+	/**
+	 * composes Student status: username, list of courses taken
+	 * @param userName: the username of the {@link Student} it's status will be returned
+	 * @return the status as String
+	 */	public String ComposeStudentStat(String userName) {
 		Student currentStudent = StudentsMap.get(userName);
 		synchronized (StudentsMap.get(userName)) {
 			ArrayList<Course> toBeSorted = currentStudent.getCourses();
@@ -180,12 +223,23 @@ public class Database {
 		}
 	}
 
+	/**
+	 * checks is the studetns that hold {@param username} is regisred to the course with {@param numOfCourse}
+	 * @param userName: username of the student
+	 * @param numOfCourse: number of the course
+	 * @return "REGISTERED" or "UNREGISTERED" string
+	 */
 	public String courseCheck(String userName, short numOfCourse) {
 		Course course = CoursesMap.get(numOfCourse);
 		if (StudentsMap.get(userName).checkCourse(course)) return "REGISTERED";
 		else return "NOT REGISTERED";
 	}
 
+	/**
+	 * unregister a {@link Student} from {@link Course}
+	 * @param userName: the username of the students we want to unregister
+	 * @param numOfCourse: the number of course we want to unregister the student from
+	 */
 	public void unregister(String userName, short numOfCourse) {
 		Course course = CoursesMap.get(numOfCourse);
 		synchronized (StudentsMap.get(userName)) {
@@ -196,12 +250,22 @@ public class Database {
 		}
 	}
 
+	/**
+	 * return a sorted (according to course input file) list of {@link Course} for a spesific {@link Student}
+	 * @param userName: the username of the students it's courses list will be returned
+	 * @return String of all the courses
+	 */
 	public String myCourses(String userName) {
 		ArrayList<Course> myCourses = StudentsMap.get(userName).getCourses();
 		sortCourses(myCourses);
 		return myCourses.toString().replaceAll("\\s","");
 	}
 
+	/**
+	 * changes a {@link User} status to "logged in"  in case it is registered and logged out
+	 * @param username: the user we want to log in
+	 * @return true if successfully logged in
+	 */
 	public boolean logIn(String username){
 		synchronized (LoggedInMap) {
 			if (!isLoggedIn(username)) {
@@ -218,14 +282,28 @@ public class Database {
 		}
 	}
 
+	/**
+	 * changes a {@link User} status to "logged out"
+	 * @param username: the user we want to log out
+	 */
 	public void logOut(String username){
 		LoggedInMap.remove(username);
 	}
 
+	/**
+	 * checks if a {@User} is logged in
+	 * @param username
+	 * @return true if the user that holds this username is in the {@param LoggedInMap}
+	 */
 	public boolean isLoggedIn(String username){
 		return LoggedInMap.containsKey(username);
 	}
 
+	/**
+	 *
+	 * @param courseToCheck
+	 * @return String with the list of {@link Student} registered to this specific {@link Course}
+	 */
 	private String getStudentsRegisteredList(Course courseToCheck) {
 		ArrayList<String> registeredStudents = new ArrayList<>();
 		for (Student student : StudentsMap.values()) {
@@ -237,17 +315,12 @@ public class Database {
 		return "Students Registered: " + registeredStudents.toString().replaceAll("\\s","");
 	}
 
+	/**
+	 * sorts a given list of {@link Course} according to the input course file
+	 * @param courses
+	 */
 	private void sortCourses(ArrayList<Course> courses) {
 		Comparator<Course> comparator = Comparator.comparingInt(o -> CoursesList.indexOf(o.getCourseNum()));
 		courses.sort(comparator);
-	}
-
-	// for testing purpose
-	public void clear(){
-		StudentsMap.clear();
-		AdminsMap.clear();
-		CoursesMap.clear();
-		LoggedInMap.clear();
-		CoursesList.clear();
 	}
 }

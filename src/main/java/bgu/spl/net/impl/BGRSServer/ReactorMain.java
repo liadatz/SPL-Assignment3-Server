@@ -1,6 +1,5 @@
 package bgu.spl.net.impl.BGRSServer;
 
-import bgu.spl.net.impl.Messages.Message;
 import bgu.spl.net.srv.Reactor;
 
 public class ReactorMain {

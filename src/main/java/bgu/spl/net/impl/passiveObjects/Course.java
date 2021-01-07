@@ -34,10 +34,6 @@ public class Course {
         return numOfMaxStudents;
     }
 
-    public int getNumOfRegistered() {
-        return numOfRegistered;
-    }
-
 /*---------------------------------methods---------------------------------*/
     public void increaseNumOfRegistered(){
         if (numOfRegistered < numOfMaxStudents) numOfRegistered++;
